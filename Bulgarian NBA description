@@ -1,0 +1,61 @@
+Bulgaria NBL Probability Calculator Features:
+🏀 Bulgarian-Specific Demographics:
+Regional Analysis:
+
+Sofia Region: 40% of NBL players (best facilities/exposure)
+Plovdiv Region: 25% of players (strong basketball culture)
+Varna Region: 15% of players (coastal tradition)
+Other Regions: Combined 20% from various areas
+Development Pathways:
+
+Professional Academy (Levski Sofia): 35% success rate
+Top Youth Club (Lukoil Academic): 25% success rate
+School Team: 12% success rate
+Physical Requirements:
+
+Average Height: 195-200cm (6'5"-6'7")
+Optimal Weight: 85-95kg (188-209 lbs)
+Excellent Vertical Jump: 70+cm (26"+)
+🎯 Key Input Fields:
+Player Information:
+
+Date of Birth (for development tracking)
+Height (Metric cm default, Imperial option available)
+Primary Position (PG, SG, SF, PF, C)
+Age Started Seriously (6-18 years old)
+Youth Club Experience (Academy/Club/School/Recreational)
+Geographic Region (Sofia/Plovdiv/Varna/Burgas/Ruse/Pleven/Other)
+International Experience (None/Youth/U20/Senior/Pro Abroad)
+Physical Attributes (Weight kg, Vertical Jump cm)
+📊 Advanced Analytics:
+Multi-Factor Calculation:
+
+Base probability: 0.2% (realistic NBL success rate)
+Height multiplier based on position-specific ranges
+Age multiplier (optimal: 6-10 years)
+Regional multipliers reflecting actual NBL player distribution
+Physical attribute multipliers for athletic assessment
+🎨 Design Features:
+Bulgarian Theme:
+
+Green-white-red color scheme matching Bulgarian flag
+Basketball court design with NBL branding
+Professional gradient backgrounds
+Comprehensive Results:
+
+Visual probability circle with Bulgarian colors
+Detailed breakdown by category (Height, Region, Development, Physical)
+Personalized recommendations based on profile
+NBL demographic reference data
+📈 Success Factors:
+Highest Probability Profile:
+
+Height: 200cm (ideal for forward/center)
+Started: 8-10 years old
+Professional academy training
+Sofia region player
+International experience
+Optimal weight and vertical jump
+The calculator provides realistic probabilities (max 2% for exceptional profiles) and actionable recommendations for Bulgarian basketball development. It's specifically tailored to the NBL's unique characteristics and regional development patterns.
+
+Try different combinations to see how various factors affect your NBL success probability!
