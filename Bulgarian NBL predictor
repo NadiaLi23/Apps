@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulgaria NBL Success Probability Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg {
+            background: linear-gradient(135deg, #00966D 0%, #1E3A8A 50%, #FF6B00 100%);
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .probability-ring {
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        .probability-ring-circle {
+            transition: stroke-dashoffset 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        .basketball-court {
+            background: linear-gradient(180deg, #00966D 0%, #1E3A8A 50%, #FF6B00 100%);
+            border: 2px solid #FF6B00;
+            position: relative;
+            overflow: hidden;
+        }
+        .court-line {
+            position: absolute;
+            background: white;
+        }
+        .center-circle {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border: 2px solid white;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .three-point-line {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border: 2px solid white;
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .three-point-line.left { left: 10px; }
+        .three-point-line.right { right: 10px; }
+        .flag-bg {
+            background: linear-gradient(135deg, rgba(0, 150, 255, 0.1) 0%, rgba(255, 255, 255, 0.05));
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <header class="text-center mb-10 fade-in">
+            <div class="inline-flex items-center justify-center mb-6">
+                <div class="basketball-court p-8 rounded-lg relative">
+                    <div class="center-circle"></div>
+                    <div class="three-point-line left"></div>
+                    <div class="three-point-line right"></div>
+                    <div class="relative z-10 text-center">
+                        <div class="flag-bg rounded-full p-3 mb-3 inline-block">
+                            <span class="text-3xl font-bold text-white">🇧🇦</span>
+                            <span class="text-white text-lg">NBL</span>
+                        </div>
+                        <h1 class="text-4xl font-bold text-white">Bulgaria NBL Success Probability Calculator</h1>
+                        <p class="text-white text-lg">Discover your odds of making it to professional basketball in Bulgaria</p>
+                    </div>
+                </div>
+            </div>
+            <p class="text-white/80 text-sm mt-2">Based on NBL demographics and Bulgarian basketball development patterns</p>
+        </header>
+
+        <!-- Main Content -->
+        <div class="grid lg:grid-cols-2 gap-8">
+            <!-- Input Form -->
+            <div class="glass-effect rounded-2xl shadow-2xl p-8 fade-in">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-user-edit mr-3 text-green-600"></i>
+                    Enter Your Information
+                </h2>
+                
+                <form id="probabilityForm" class="space-y-6">
+                    <!-- Date of Birth -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-calendar-alt mr-2 text-green-500"></i>Date of Birth
+                        </label>
+                        <input type="date" id="birthDate" required 
+                               class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none transition-colors">
+                    </div>
+
+                    <!-- Height -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-ruler-vertical mr-2 text-green-500"></i>Height
+                        </label>
+                        <div class="mb-2">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="unitSystem" value="metric" checked class="mr-2">
+                                <span class="text-sm">Metric (cm)</span>
+                            </label>
+                            <label class="inline-flex items-center ml-4">
+                                <input type="radio" name="unitSystem" value="imperial" class="mr-2">
+                                <span class="text-sm">Imperial (ft/in)</span>
+                            </label>
+                        </div>
+                        <div id="heightInputs" class="grid grid-cols-2 gap-2">
+                            <input type="number" id="heightCm" placeholder="Centimeters" min="150" max="240" required
+                                   class="px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none transition-colors col-span-2">
+                        </div>
+                    </div>
+
+                    <!-- Position -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-running mr-2 text-green-500"></i>Primary Position
+                        </label>
+                        <select id="position" required 
+                                class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none transition-colors">
+                            <option value="">Select Position</option>
+                            <option value="pg">Point Guard (PG)</option>
+                            <option value="sg">Shooting Guard (SG)</option>
+                            <option value="sf">Small Forward (SF)</option>
+                            <option value="pf">Power Forward (PF)</option>
+                            <option value="c">Center (C)</option>
+                        </select>
+                    </div>
+
+                    <!-- Age Started Playing -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-clock mr-2 text-green-500"></i>Age Started Playing Seriously
+                        </label>
+                        <select id="ageStarted" required 
+                                class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none transition-colors">
+                            <option value="">Select Age</option>
+                            <option value="6">6 years old</option>
+                            <option value="8">8 years old</option>
+                            <option value="10">10 years old</option>
+                            <option value="12">12 years old</option>
+                            <option value="14">14 years old</option>
+                            <option value="16">16 years old</option>
+                            <option value="18">18+ years old</option>
+                        </select>
+                    </div>
+
+                    <!-- Youth Club Experience -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-users mr-2 text-green-500"></i>Youth Club Experience
+                        </label>
+                        <select id="youthClub" required 
+                                class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none transition-colors">
+                            <option value="">Select Experience Level</option>
+                            <option value="academy">Professional Academy (e.g., Levski Sofia)</option>
+                            <option value="club">Top Youth Club (e.g., Lukoil Academic)</option>
+                            <option value="school">School Team</option>
+                            <option value="recreational">Recreational Only</option>
+                        </select>
+                    </div>
+
+                    <!-- Geographic Region -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-map-marker-alt mr-2 text-green-500"></i>Geographic Region in Bulgaria
+                        </label>
+                        <select id="region" required 
+                                class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none transition-colors">
+                            <option value="">Select Region</option>
+                            <option value="sofia">Sofia Region</option>
+                            <option value="plovdiv">Plovdiv Region</option>
+                            <option value="varna">Varna Region</option>
+                            <option value="burgas">Burgas Region</option>
+                            <option value="ruse">Ruse Region</option>
+                            <option value="pleven">Pleven Region</option>
+                            <option value="other">Other Region</option>
+                        </select>
+                    </div>
+
+                    <!-- International Experience -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-globe mr-2 text-green-500"></i>International Experience
+                        </label>
+                        <select id="internationalExp" required 
+                                class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none transition-colors">
+                            <option value="">Select Experience</option>
+                            <option value="none">None</option>
+                            <option value="youth">Youth National Team</option>
+                            <option value="u20">U20 National Team</option>
+                            <option value="senior">Senior National Team</option>
+                            <option value="pro">Professional Abroad</option>
+                        </select>
+                    </div>
+
+                    <!-- Physical Attributes -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i class="fas fa-weight mr-2 text-green-500"></i>Weight (kg)
+                            </label>
+                            <input type="number" id="weight" placeholder="Weight in kg" min="60" max="150" required
+                                   class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i class="fas fa-tachometer-alt mr-2 text-green-500"></i>Vertical Jump (cm)
+                            </label>
+                            <input type="number" id="verticalJump" placeholder="Vertical jump in cm" min="30" max="80" required
+                                   class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none transition-colors">
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" 
+                            class="w-full bg-gradient-to-r from-green-600 to-blue-600 text-white font-bold py-4 px-6 rounded-lg hover:from-green-700 hover:to-blue-700 transition-all transform hover:scale-105 shadow-lg">
+                        <i class="fas fa-calculator mr-2"></i>
+                        Calculate My NBL Probability
+                    </button>
+                </form>
+            </div>
+
+            <!-- Results Section -->
+            <div class="glass-effect rounded-2xl shadow-2xl p-8 fade-in">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-chart-line mr-3 text-blue-600"></i>
+                    Your Results
+                </h2>
+
+                <div id="results" class="hidden">
+                    <!-- Probability Circle -->
+                    <div class="text-center mb-8">
+                        <div class="relative inline-block">
+                            <svg width="200" height="200" class="probability-ring">
+                                <circle cx="100" cy="100" r="90" stroke="#e5e7eb" stroke-width="20" fill="none"/>
+                                <circle id="probabilityCircle" cx="100" cy="100" r="90" 
+                                        stroke="url(#gradient)" stroke-width="20" fill="none"
+                                        stroke-dasharray="565.48" stroke-dashoffset="565.48"
+                                        class="probability-ring-circle"/>
+                                <defs>
+                                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#00966D;stop-opacity:1" />
+                                        <stop offset="50%" style="stop-color:#1E3A8A;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#FF6B00;stop-opacity:1" />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <span id="probabilityPercent" class="text-4xl font-bold text-gray-800">0%</span>
+                                <span class="text-sm text-gray-600">NBL Success Rate</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Breakdown -->
+                    <div class="space-y-4">
+                        <div class="bg-green-50 rounded-lg p-4 border-l-4 border-green-500">
+                            <h3 class="font-semibold text-green-800 mb-2">
+                                <i class="fas fa-ruler-vertical mr-2"></i>Height & Position Analysis
+                            </h3>
+                            <p id="heightAnalysis" class="text-sm text-green-700"></p>
+                        </div>
+
+                        <div class="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-500">
+                            <h3 class="font-semibold text-blue-800 mb-2">
+                                <i class="fas fa-map-marker-alt mr-2"></i>Regional Advantage
+                            </h3>
+                            <p id="regionAnalysis" class="text-sm text-blue-700"></p>
+                        </div>
+
+                        <div class="bg-purple-50 rounded-lg p-4 border-l-4 border-purple-500">
+                            <h3 class="font-semibold text-purple-800 mb-2">
+                                <i class="fas fa-basketball-ball mr-2"></i>Development Background
+                            </h3>
+                            <p id="developmentAnalysis" class="text-sm text-purple-700"></p>
+                        </div>
+
+                        <div class="bg-orange-50 rounded-lg p-4 border-l-4 border-orange-500">
+                            <h3 class="font-semibold text-orange-800 mb-2">
+                                <i class="fas fa-star mr-2"></i>Physical Attributes
+                            </h3>
+                            <div class="grid grid-cols-2 gap-2 text-sm">
+                                <div>
+                                    <span class="font-semibold">Weight Analysis:</span>
+                                    <p id="weightAnalysis" class="text-orange-700"></p>
+                                </div>
+                                <div>
+                                    <span class="font-semibold">Vertical Jump:</span>
+                                    <p id="jumpAnalysis" class="text-orange-700"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recommendations -->
+                    <div class="mt-6 bg-yellow-50 rounded-lg p-4 border-l-4 border-yellow-500">
+                        <h3 class="font-semibold text-yellow-800 mb-2">
+                            <i class="fas fa-lightbulb mr-2"></i>Recommendations
+                        </h3>
+                        <ul id="recommendations" class="text-sm text-yellow-700 space-y-1 list-disc list-inside">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Initial State -->
+                <div id="initialState" class="text-center py-12">
+                    <i class="fas fa-basketball-ball text-6xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-500">Enter your information to see your NBL probability</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Footer -->
+        <div class="mt-12 glass-effect rounded-2xl p-6 text-center">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Bulgarian NBL Demographics</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
+                <div class="bg-white rounded-lg p-4 shadow">
+                    <h4 class="font-semibold text-gray-700 mb-2">🏀 Average NBL Player Profile</h4>
+                    <ul class="space-y-1 text-gray-600">
+                        <li><strong>Height:</strong> 195-200cm (6'5"-6'7")</li>
+                        <li><strong>Weight:</strong> 85-95kg (188-209 lbs)</li>
+                        <li><strong>Age:</strong> 24-28 years old</li>
+                        <li><strong>Vertical Jump:</strong> 65-75cm (26"-29")</li>
+                    </ul>
+                </div>
+                <div class="bg-white rounded-lg p-4 shadow">
+                    <h4 class="font-semibold text-gray-700 mb-2">🏆 Top NBL Teams & Development</h4>
+                    <ul class="space-y-1 text-gray-600">
+                        <li><strong>Levski Sofia:</strong> Most successful club, produces most national team players</li>
+                        <li><strong>Lukoil Academic:</strong> Strong youth development program</li>
+                        <li><strong>Balkan Botevgrad:</strong> Historical powerhouse with strong academy</li>
+                        <li><strong>PBC Academic:</strong> Premier development system</li>
+                    </ul>
+                </div>
+                <div class="bg-white rounded-lg p-4 shadow">
+                    <h4 class="font-semibold text-gray-700 mb-2">🌍 Regional Success Factors</h4>
+                    <ul class="space-y-1 text-gray-600">
+                        <li><strong>Sofia Region:</strong> 40% of NBL players come from capital area</li>
+                        <li><strong>Plovdiv Region:</strong> 25% of players, strong basketball culture</li>
+                        <li><strong>Varna Region:</strong> 15% of players, coastal basketball tradition</li>
+                        <li><strong>Other Regions:</strong> 20% combined from various areas</li>
+                    </ul>
+                </div>
+                <div class="bg-white rounded-lg p-4 shadow">
+                    <h4 class="font-semibold text-gray-700 mb-2">📊 Success Requirements</h4>
+                    <ul class="space-y-1 text-gray-600">
+                        <li><strong>Height:</strong> 190cm+ preferred for forwards/centers</li>
+                        <li><strong>Age Started:</strong> 6-10 years optimal for development</li>
+                        <li><strong>Professional Academy:</strong> Highest success rate (35%)</li>
+                        <li><strong>Youth National Team:</strong> Required for international prospects</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="text-gray-500 text-xs mt-4">
+                <i class="fas fa-info-circle mr-2"></i>
+                Based on NBL historical data and Bulgarian basketball development patterns. Success rates are estimates and individual talent varies significantly.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // NBL demographic data
+        const nblData = {
+            regions: {
+                sofia: { multiplier: 1.4, description: "Sofia Region - 40% of NBL players, best facilities and exposure" },
+                plovdiv: { multiplier: 1.2, description: "Plovdiv Region - 25% of players, strong basketball culture" },
+                varna: { multiplier: 1.1, description: "Varna Region - 15% of players, coastal tradition" },
+                burgas: { multiplier: 1.0, description: "Burgas Region - developing basketball area" },
+                ruse: { multiplier: 0.9, description: "Ruse Region - northern basketball hub" },
+                pleven: { multiplier: 1.0, description: "Pleven Region - competitive area" },
+                other: { multiplier: 0.8, description: "Other regions - varies by location" }
+            },
+            youthClubs: {
+                academy: { multiplier: 1.5, description: "Professional academy like Levski Sofia" },
+                club: { multiplier: 1.2, description: "Top youth club system" },
+                school: { multiplier: 0.8, description: "School team only" },
+                recreational: { multiplier: 0.4, description: "Recreational background" }
+            },
+            positions: {
+                pg: { avgHeight: 185, range: [175, 195], name: "Point Guard" },
+                sg: { avgHeight: 190, range: [180, 200], name: "Shooting Guard" },
+                sf: { avgHeight: 195, range: [185, 205], name: "Small Forward" },
+                pf: { avgHeight: 200, range: [190, 210], name: "Power Forward" },
+                c: { avgHeight: 205, range: [195, 215], name: "Center" }
+            },
+            internationalExp: {
+                none: { multiplier: 0.6, description: "No international experience" },
+                youth: { multiplier: 0.8, description: "Youth national Team participation" },
+                u20: { multiplier: 1.0, description: "U20 National Team experience" },
+                senior: { multiplier: 1.3, description: "Senior National Team" },
+                pro: { multiplier: 1.5, description: "Professional experience Abroad" }
+            },
+            physicalAttributes: {
+                weight: { optimal: [85, 95], description: "85-95kg optimal for NBL" },
+                verticalJump: { excellent: [70, 80], description: "70+cm vertical jump considered excellent" }
+            }
+        };
+
+        // Height conversion functions
+        function cmToInches(cm) {
+            return cm / 2.54;
+        }
+
+        function formatHeight(cm, useMetric) {
+            if (useMetric) {
+                return `${cm} cm`;
+            } else {
+                const inches = cmToInches(cm);
+                const feet = Math.floor(inches / 12);
+                const remainingInches = Math.round(inches % 12);
+                return `${feet}'${remainingInches}"`;
+            }
+        }
+
+        // Calculate probability
+        document.getElementById('probabilityForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const birthDate = document.getElementById('birthDate').value;
+            const unitSystem = document.querySelector('input[name="unitSystem"]:checked').value;
+            const heightCm = parseFloat(document.getElementById('heightCm').value) || 0;
+            const height = heightCm; // Always work in cm for NBL
+            const position = document.getElementById('position').value;
+            const ageStarted = document.getElementById('ageStarted').value;
+            const youthClub = document.getElementById('youthClub').value;
+            const region = document.getElementById('region').value;
+            const internationalExp = document.getElementById('internationalExp').value;
+            const weight = parseFloat(document.getElementById('weight').value) || 0;
+            const verticalJump = parseFloat(document.getElementById('verticalJump').value) || 0;
+            
+            // Calculate base probability (very low base rate for NBL)
+            let baseProbability = 0.002; // 0.2% base rate
+            
+            // Apply multipliers
+            let probability = baseProbability;
+            
+            // Height multiplier
+            if (position && nblData.positions[position]) {
+                const posData = nblData.positions[position];
+                const heightDiff = Math.abs(height - posData.avgHeight);
+                let heightMultiplier = 1.0;
+                
+                if (heightDiff <= 5) {
+                    heightMultiplier = 1.4; // Ideal height
+                } else if (heightDiff <= 10) {
+                    heightMultiplier = 1.2; // Good height
+                } else if (heightDiff <= 15) {
+                    heightMultiplier = 0.9; // Acceptable height
+                } else {
+                    heightMultiplier = 0.6; // Challenging height
+                }
+                probability *= heightMultiplier;
+            }
+            
+            // Age multiplier
+            const age = parseInt(ageStarted);
+            if (age >= 6 && age <= 10) {
+                probability *= 1.3; // Optimal age range
+            } else if (age >= 8 && age <= 14) {
+                probability *= 1.1; // Good age range
+            } else if (age >= 12 && age <= 16) {
+                probability *= 0.9; // Acceptable
+            } else {
+                probability *= 0.7; // Late start
+            }
+            
+            // Youth club multiplier
+            if (youthClub && nblData.youthClubs[youthClub]) {
+                probability *= nblData.youthClubs[youthClub].multiplier;
+            }
+            
+            // Region multiplier
+            if (region && nblData.regions[region]) {
+                probability *= nblData.regions[region].multiplier;
+            }
+            
+            // International experience multiplier
+            if (internationalExp && nblData.internationalExp[internationalExp]) {
+                probability *= nblData.internationalExp[internationalExp].multiplier;
+            }
+            
+            // Physical attributes multipliers
+            if (weight >= nblData.physicalAttributes.weight.optimal[0] && weight <= nblData.physicalAttributes.weight.optimal[1]) {
+                probability *= 1.1; // Optimal weight
+            } else if (weight >= 75 && weight <= 100) {
+                probability *= 1.0; // Good weight
+            } else if (weight < 75 || weight > 110) {
+                probability *= 0.8; // Challenging weight
+            }
+            
+            if (verticalJump >= nblData.physicalAttributes.verticalJump.excellent[0]) {
+                probability *= 1.2; // Excellent vertical
+            } else if (verticalJump >= 60) {
+                probability *= 1.1; // Good vertical
+            } else {
+                probability *= 0.8; // Poor vertical
+            }
+            
+            // Cap at reasonable maximum (2% for exceptional profile)
+            probability = Math.min(probability, 0.02);
+            
+            // Convert to percentage
+            const percentage = (probability * 100).toFixed(2);
+            
+            // Display results
+            displayResults(percentage, birthDate, height, position, ageStarted, youthClub, region, internationalExp, weight, verticalJump, unitSystem);
+        });
+
+        function displayResults(percentage, birthDate, height, position, ageStarted, youthClub, region, internationalExp, weight, verticalJump, unitSystem) {
+            // Hide initial state, show results
+            document.getElementById('initialState').classList.add('hidden');
+            document.getElementById('results').classList.remove('hidden');
+            
+            // Update probability circle
+            const circle = document.getElementById('probabilityCircle');
+            const percentText = document.getElementById('probabilityPercent');
+            const circumference = 2 * Math.PI * 90;
+            const offset = circumference - (percentage / 100) * circumference;
+            
+            circle.style.strokeDashoffset = offset;
+            percentText.textContent = percentage + '%';
+            
+            // Generate analysis text
+            generateAnalysis(percentage, birthDate, height, position, ageStarted, youthClub, region, internationalExp, weight, verticalJump, unitSystem);
+        }
+
+        function generateAnalysis(percentage, birthDate, height, position, ageStarted, youthClub, region, internationalExp, weight, verticalJump, unitSystem) {
+            // Height analysis
+            let heightText = '';
+            if (position && nblData.positions[position]) {
+                const posData = nblData.positions[position];
+                const heightDiff = height - posData.avgHeight;
+                const heightDisplay = formatHeight(height, unitSystem === 'metric');
+                const avgDisplay = formatHeight(posData.avgHeight, unitSystem === 'metric');
+                
+                if (Math.abs(heightDiff) <= 5) {
+                    heightText = `Excellent! At ${heightDisplay} you have ideal height for a ${posData.name}, matching the NBL average of ${avgDisplay}.`;
+                } else if (Math.abs(heightDiff) <= 10) {
+                    heightText = `Very good! At ${heightDisplay} you're within the typical range for ${posData.name}s (NBL average: ${avgDisplay}).`;
+                } else if (Math.abs(heightDiff) <= 15) {
+                    heightText = `Acceptable! At ${heightDisplay} you're slightly shorter/taller than average for ${posData.name}s, but can compensate with skills.`;
+                } else {
+                    heightText = `Challenging! At ${heightDisplay} you're significantly outside the typical range for ${posData.name}s in the NBL.`;
+                }
+            }
+            
+            // Regional analysis
+            let regionText = '';
+            if (region && nblData.regions[region]) {
+                regionText = nblData.regions[region].description;
+            } else {
+                regionText = 'Region data helps identify development opportunities and competition levels.';
+            }
+            
+            // Development analysis
+            let developmentText = '';
+            if (youthClub && nblData.youthClubs[youthClub]) {
+                developmentText = nblData.youthClubs[youthClub].description;
+            } else {
+                developmentText = 'Youth development background significantly impacts NBL success rates.';
+            }
+            
+            // Physical attributes analysis
+            let weightText = '';
+            let jumpText = '';
+            
+            if (weight >= nblData.physicalAttributes.weight.optimal[0] && weight <= nblData.physicalAttributes.weight.optimal[1]) {
+                weightText = 'Optimal weight range for NBL professional basketball.';
+            } else if (weight >= 75 && weight <= 100) {
+                weightText = 'Good weight that provides balance of strength and mobility.';
+            } else if (weight < 75 || weight > 110) {
+                weightText = 'Weight outside optimal range may affect conditioning and performance.';
+            }
+            
+            if (verticalJump >= nblData.physicalAttributes.verticalJump.excellent[0]) {
+                jumpText = 'Excellent vertical jump - significant athletic advantage.';
+            } else if (verticalJump >= 60) {
+                jumpText = 'Good vertical jump for competitive level.';
+            } else {
+                jumpText = 'Vertical jump below average may need specific training focus.';
+            }
+            
+            // Update display
+            document.getElementById('heightAnalysis').textContent = heightText;
+            document.getElementById('regionAnalysis').textContent = regionText;
+            document.getElementById('developmentAnalysis').textContent = developmentText;
+            document.getElementById('weightAnalysis').textContent = weightText;
+            document.getElementById('jumpAnalysis').textContent = jumpText;
+            
+            // Generate recommendations
+            const recommendations = [];
+            
+            if (percentage < 0.5) {
+                recommendations.push('Focus on exceptional skill development to maximize your potential');
+                recommendations.push('Consider joining a professional academy or top youth club');
+            }
+            
+            if (position && nblData.positions[position]) {
+                const heightDiff = height - nblData.positions[position].avgHeight;
+                if (heightDiff < -10) {
+                    recommendations.push(`Work extensively on position-specific skills for ${nblData.positions[position].name}`);
+                    recommendations.push('Study successful shorter players at your position');
+                } else if (heightDiff > 15) {
+                    recommendations.push(`Leverage your height advantage in the ${nblData.positions[position].name} position`);
+                    recommendations.push('Develop post moves and rebounding skills');
+                } else {
+                    recommendations.push(`Focus on versatility and basketball IQ for ${nblData.positions[position].name} role`);
+                }
+            }
+            
+            const age = parseInt(ageStarted);
+            if (age > 14) {
+                recommendations.push('Late start to serious basketball requires accelerated development');
+                recommendations.push('Consider specialized training camps and individual coaching');
+            }
+            
+            if (internationalExp === 'none') {
+                recommendations.push('Gain international experience through youth national teams');
+                recommendations.push('Participate in European youth tournaments');
+            }
+            
+            if (verticalJump < 60) {
+                recommendations.push('Focus on plyometric training and explosive power development');
+                recommendations.push('Work with strength and conditioning coaches');
+            }
+            
+            recommendations.push('Maintain excellent physical conditioning');
+            recommendations.push('Study Bulgarian NBL game footage and playing styles');
+            recommendations.push('Develop language skills - Bulgarian is beneficial for NBL');
+            recommendations.push('Build relationships with Bulgarian coaches and players');
+            
+            const recommendationsList = document.getElementById('recommendations');
+            recommendationsList.innerHTML = recommendations.map(rec => `<li>${rec}</li>`).join('');
+        }
+    </script>
+</body>
+</html>
